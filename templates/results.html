@@ -1,0 +1,313 @@
+{% include 'header.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Autism Screening Result</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            padding-top: 80px;
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .result-card {
+            border-radius: 15px;
+            border: none;
+            overflow: hidden;
+        }
+        .risk-badge {
+            font-size: 1rem;
+            padding: 0.6rem 1rem;
+            border-radius: 50px;
+        }
+        .treatment-card {
+            border-radius: 10px;
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+        .treatment-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .accordion-button:not(.collapsed) {
+            background-color: rgba(13, 110, 253, 0.1);
+            color: #0d6efd;
+        }
+        .resource-link {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+        .resource-link:hover {
+            text-decoration: underline;
+        }
+        .section-title {
+            position: relative;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .section-title:after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 3px;
+            background: #0d6efd;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow result-card mb-5">
+                    <div class="card-body p-4 p-md-5">
+                        <h2 class="mb-4 text-center text-primary">Autism Screening Results</h2>
+
+                        <div class="alert alert-{{ 'success' if result.prediction == 'No' else 'danger' }} mb-4">
+                            <h4 class="alert-heading mb-0 d-flex align-items-center">
+                                <i class="bi bi-{{ 'check-circle' if result.prediction == 'No' else 'exclamation-triangle' }} me-2"></i>
+                                Screening Result: 
+                                <span class="badge bg-{{ 'success' if result.prediction == 'No' else 'danger' }} ms-2">
+                                    {{ result.prediction }}
+                                </span>
+                            </h4>
+                        </div>
+
+                        <div class="row mb-4 text-center">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                <div class="p-3 bg-light rounded">
+                                    <h5 class="text-muted mb-2">Q-Chat Score</h5>
+                                    <div class="display-4 text-primary fw-bold">{{ result.score }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded">
+                                    <h5 class="text-muted mb-2">Risk Level</h5>
+                                    <span class="badge risk-badge bg-{{ 'success' if result.risk_level == 'Low' else 'warning text-dark' if result.risk_level == 'Medium' else 'danger' }}">
+                                        {{ result.risk_level }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if result.risk_questions %}
+                        <div class="mb-5">
+                            <h5 class="section-title">Identified Risk Questions</h5>
+                            <div class="list-group">
+                                {% for qcode in result.risk_questions %}
+                                    <div class="list-group-item py-3">
+                                        <div class="d-flex">
+                                            <span class="badge bg-danger me-3 align-self-start">Q{{ loop.index }}</span>
+                                            <div>{{ questions[loop.index0]['text'] }}</div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-5">
+                            <h5 class="section-title">Recommended Treatment Options</h5>
+                            
+                            <div class="accordion mb-4" id="treatmentAccordion">
+                                <!-- Low Risk Treatments -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#lowRisk">
+                                            <i class="bi bi-check-circle text-success me-2"></i> Low Risk Treatment Options
+                                        </button>
+                                    </h2>
+                                    <div id="lowRisk" class="accordion-collapse collapse show" data-bs-parent="#treatmentAccordion">
+                                        <div class="accordion-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <div class="treatment-card p-3 h-100 border-start border-success">
+                                                        <h5><i class="bi bi-people text-success me-2"></i> Parent Education and Training</h5>
+                                                        <p class="text-muted">Learning strategies to support your child's development, communication, and behavior management at home.</p>
+                                                        <a href="https://www.youtube.com/watch?v=ubflRfUOByI" class="resource-link" target="_blank">Learn more <i class="bi bi-box-arrow-up-right"></i></a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="treatment-card p-3 h-100 border-start border-success">
+                                                        <h5><i class="bi bi-chat-square-text text-success me-2"></i> Speech and Language Therapy</h5>
+                                                        <p class="text-muted">Helps develop communication skills, language comprehension, and social use of language.</p>
+                                                        <a href="https://www.youtube.com/watch?v=pSGVb60-BSw" class="resource-link" target="_blank">Learn more <i class="bi bi-box-arrow-up-right"></i></a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="treatment-card p-3 h-100 border-start border-success">
+                                                        <h5><i class="bi bi-clipboard2-pulse text-success me-2"></i> Developmental Monitoring</h5>
+                                                        <p class="text-muted">Regular check-ups with pediatrician to track developmental milestones and address any concerns early.</p>
+                                                        <a href="https://www.verywellmind.com/signs-of-autism-in-babies-7486843" class="resource-link" target="_blank">Learn more <i class="bi bi-box-arrow-up-right"></i></a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="treatment-card p-3 h-100 border-start border-success">
+                                                        <h5><i class="bi bi-emoji-smile text-success me-2"></i> Social Engagement Activities</h5>
+                                                        <p class="text-muted">Playgroups, storytime sessions, and other activities that promote social interaction and engagement.</p>
+                                                        <a href="https://www.autismspeaks.org/science-news/autism-speaks-releases-new-cst-caregiver-quick-tips-videos-support-parents-and" class="resource-link" target="_blank">Learn more <i class="bi bi-box-arrow-up-right"></i></a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Medium Risk Treatments -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#mediumRisk">
+                                            <i class="bi bi-exclamation-triangle text-warning me-2"></i> Medium Risk Treatment Options
+                                        </button>
+                                    </h2>
+                                    <div id="mediumRisk" class="accordion-collapse collapse" data-bs-parent="#treatmentAccordion">
+                                        <div class="accordion-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <div class="treatment-card p-3 h-100 border-start border-warning">
+                                                        <h5><i class="bi bi-people text-warning me-2"></i> Parent Education and Training</h5>
+                                                        <p class="text-muted">Learning strategies to support your child's development, communication, and behavior management at home.</p>
+                                                        <a href="https://www.youtube.com/watch?v=ubflRfUOByI" class="resource-link" target="_blank">Learn more <i class="bi bi-box-arrow-up-right"></i></a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="treatment-card p-3 h-100 border-start border-warning">
+                                                        <h5><i class="bi bi-chat-square-text text-warning me-2"></i> Speech and Language Therapy</h5>
+                                                        <p class="text-muted">Helps develop communication skills, language comprehension, and social use of language.</p>
+                                                        <a href="https://www.youtube.com/watch?v=pSGVb60-BSw" class="resource-link" target="_blank">Learn more <i class="bi bi-box-arrow-up-right"></i></a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="treatment-card p-3 h-100 border-start border-warning">
+                                                        <h5><i class="bi bi-brush text-warning me-2"></i> Occupational Therapy</h5>
+                                                        <p class="text-muted">Addresses sensory processing, fine motor skills, and daily living activities to improve function and independence.</p>
+                                                        <a href="https://www.youtube.com/channel/UChdlLGmro7NzDgCEF5SoLsQ" class="resource-link" target="_blank">Learn more <i class="bi bi-box-arrow-up-right"></i></a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="treatment-card p-3 h-100 border-start border-warning">
+                                                        <h5><i class="bi bi-joystick text-warning me-2"></i> Play Therapy</h5>
+                                                        <p class="text-muted">Uses play to help children express themselves, develop social skills, and address emotional or behavioral challenges.</p>
+                                                        <a href="https://www.youtube.com/watch?v=i0PPjK0lc9A" class="resource-link" target="_blank">Learn more <i class="bi bi-box-arrow-up-right"></i></a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="treatment-card p-3 h-100 border-start border-warning">
+                                                        <h5><i class="bi bi-building text-warning me-2"></i> Developmental Preschool</h5>
+                                                        <p class="text-muted">Structured programs designed to support children with developmental concerns in a supportive educational environment.</p>
+                                                        <a href="https://www.childrens.com/specialties-services/specialty-centers-and-programs/center-for-autism-care-parent-education-videos" class="resource-link" target="_blank">Learn more <i class="bi bi-box-arrow-up-right"></i></a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- High Risk Treatments -->
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#highRisk">
+                                            <i class="bi bi-exclamation-octagon text-danger me-2"></i> High Risk Treatment Options
+                                        </button>
+                                    </h2>
+                                    <div id="highRisk" class="accordion-collapse collapse" data-bs-parent="#treatmentAccordion">
+                                        <div class="accordion-body">
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <div class="treatment-card p-3 h-100 border-start border-danger">
+                                                        <h5><i class="bi bi-people text-danger me-2"></i> Parent Education and Training</h5>
+                                                        <p class="text-muted">Learning strategies to support your child's development, communication, and behavior management at home.</p>
+                                                        <a href="https://www.youtube.com/watch?v=ubflRfUOByI" class="resource-link" target="_blank">Learn more <i class="bi bi-box-arrow-up-right"></i></a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="treatment-card p-3 h-100 border-start border-danger">
+                                                        <h5><i class="bi bi-chat-square-text text-danger me-2"></i> Speech and Language Therapy</h5>
+                                                        <p class="text-muted">Helps develop communication skills, language comprehension, and social use of language.</p>
+                                                        <a href="https://www.youtube.com/watch?v=pSGVb60-BSw" class="resource-link" target="_blank">Learn more <i class="bi bi-box-arrow-up-right"></i></a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="treatment-card p-3 h-100 border-start border-danger">
+                                                        <h5><i class="bi bi-activity text-danger me-2"></i> Applied Behavior Analysis (ABA)</h5>
+                                                        <p class="text-muted">Evidence-based therapy that focuses on improving specific behaviors such as communication, social skills, learning, and adaptive living skills.</p>
+                                                        <a href="https://www.youtube.com/channel/UChdlLGmro7NzDgCEF5SoLsQ" class="resource-link" target="_blank">Learn more <i class="bi bi-box-arrow-up-right"></i></a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="treatment-card p-3 h-100 border-start border-danger">
+                                                        <h5><i class="bi bi-brush text-danger me-2"></i> Occupational Therapy</h5>
+                                                        <p class="text-muted">Addresses sensory processing, fine motor skills, and daily living activities to improve function and independence.</p>
+                                                        <a href="https://www.youtube.com/channel/UChdlLGmro7NzDgCEF5SoLsQ" class="resource-link" target="_blank">Learn more <i class="bi bi-box-arrow-up-right"></i></a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="treatment-card p-3 h-100 border-start border-danger">
+                                                        <h5><i class="bi bi-people-fill text-danger me-2"></i> Social Skills Training</h5>
+                                                        <p class="text-muted">Structured teaching of social interaction, communication, and emotional understanding in individual or group settings.</p>
+                                                        <a href="https://autismtherapies.com/parent-resources/video" class="resource-link" target="_blank">Learn more <i class="bi bi-box-arrow-up-right"></i></a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="treatment-card p-3 h-100 border-start border-danger">
+                                                        <h5><i class="bi bi-heart-pulse text-danger me-2"></i> Early Intensive Behavioral Intervention</h5>
+                                                        <p class="text-muted">Comprehensive treatment programs for young children, typically involving 25-40 hours of therapy per week.</p>
+                                                        <a href="https://www.youtube.com/watch?v=L-aohWG5do0" class="resource-link" target="_blank">Learn more <i class="bi bi-box-arrow-up-right"></i></a>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="treatment-card p-3 h-100 border-start border-danger">
+                                                        <h5><i class="bi bi-laptop text-danger me-2"></i> Assistive Technology</h5>
+                                                        <p class="text-muted">Communication devices, visual supports, and other tools that can help with communication and learning.</p>
+                                                        <a href="https://en.wikipedia.org/wiki/Video_modeling" class="resource-link" target="_blank">Learn more <i class="bi bi-box-arrow-up-right"></i></a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5 class="section-title">Finding Professionals</h5>
+                            <div class="card bg-light border-0">
+                                <div class="card-body">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item bg-transparent">
+                                            <i class="bi bi-check-circle text-primary me-2"></i>
+                                            Consult with your child's pediatrician for referrals
+                                        </li>
+                                        <li class="list-group-item bg-transparent">
+                                            <i class="bi bi-check-circle text-primary me-2"></i>
+                                            Contact your local early intervention program
+                                        </li>
+                                        <li class="list-group-item bg-transparent">
+                                            <i class="bi bi-check-circle text-primary me-2"></i>
+                                            Reach out to autism support organizations like Autism Speaks
+                                        </li>
+                                        <li class="list-group-item bg-transparent">
+                                            <i class="bi bi-check-circle text-primary me-2"></i>
+                                            Check with your health insurance provider for covered specialists
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <a href="{{ url_for('index') }}" class="btn btn-primary px-4 py-2">
+                                <i class="bi bi-house-door me-2"></i> Back to Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
