@@ -18,9 +18,9 @@ Autism Spectrum Disorder (ASD) is a developmental disorder affecting communicati
 
 ## Features
 
-- 10-question autism screening form (based on standard metrics)
-- Machine learning model for classification (e.g., Random Forest, SVM, etc.)
-- erformance metrics (accuracy, precision, recall)
+- 10-question autism screening form
+- Machine learning model for classification (XGBoost)
+- Performance metrics 
 - Custom advice/treatment suggestions based on predicted risk level
 - Frontend: Simple web interface for user input and results
 
